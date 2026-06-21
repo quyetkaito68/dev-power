@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create *)",
+      "Bash(cd \"f:/Coding\" && npm create vite@latest dev-power -- --template react-ts 2>&1)",
+      "Read(//f/Coding/**)",
+      "Bash(Get-ChildItem \"f:\\\\Coding\\\\dev-power\" -Force)"
+    ]
+  }
+}
