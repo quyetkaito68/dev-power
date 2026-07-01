@@ -6,6 +6,7 @@ const categoryColors: Record<ToolCategory, string> = {
   encoder: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
   generator: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
   media: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+  text: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
 };
 
 const categoryLabels: Record<ToolCategory, string> = {
@@ -13,6 +14,7 @@ const categoryLabels: Record<ToolCategory, string> = {
   encoder: 'Encoder',
   generator: 'Generator',
   media: 'Media',
+  text: 'Text',
 };
 
 interface BadgeProps {

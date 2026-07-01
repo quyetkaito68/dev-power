@@ -1,7 +1,7 @@
 import type { ComponentType } from 'react';
 import type { LucideIcon } from 'lucide-react';
 
-export type ToolCategory = 'formatter' | 'encoder' | 'generator' | 'media';
+export type ToolCategory = 'formatter' | 'encoder' | 'generator' | 'media' | 'text';
 
 export interface Tool {
   id: string;
@@ -24,4 +24,5 @@ export const CATEGORIES: CategoryMeta[] = [
   { id: 'encoder', label: 'Encoders', color: 'text-violet-400' },
   { id: 'generator', label: 'Generators', color: 'text-emerald-400' },
   { id: 'media', label: 'Media', color: 'text-orange-400' },
+  { id: 'text', label: 'Text Utilities', color: 'text-cyan-400' },
 ];

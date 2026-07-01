@@ -9,6 +9,7 @@ const categoryColors: Record<string, string> = {
   encoder: 'bg-violet-500/10 text-violet-400 border-violet-500/20 hover:bg-violet-500/15',
   generator: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/15',
   media: 'bg-orange-500/10 text-orange-400 border-orange-500/20 hover:bg-orange-500/15',
+  text: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20 hover:bg-cyan-500/15',
 };
 
 export function WelcomePage() {

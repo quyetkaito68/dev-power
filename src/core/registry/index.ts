@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { Braces, ArrowLeftRight, Image, QrCode, Shuffle } from 'lucide-react';
+import { Braces, ArrowLeftRight, Image, QrCode, Shuffle, Type } from 'lucide-react';
 import type { Tool } from '../types';
 
 const JsonTool = lazy(() => import('../../tools/json'));
@@ -7,6 +7,7 @@ const Base64Tool = lazy(() => import('../../tools/base64'));
 const ImageBase64Tool = lazy(() => import('../../tools/imageBase64'));
 const QrTool = lazy(() => import('../../tools/qr'));
 const RandomTool = lazy(() => import('../../tools/random'));
+const TextFormatterTool = lazy(() => import('../../tools/text-formatter'));
 
 export const tools: Tool[] = [
   {
@@ -53,6 +54,15 @@ export const tools: Tool[] = [
     icon: Shuffle,
     component: RandomTool,
     keywords: ['random', 'generate', 'uuid', 'email', 'phone', 'color', 'string', 'text', 'fake', 'mock'],
+  },
+  {
+    id: 'text-formatter',
+    name: 'Text Formatter',
+    description: 'Transform text into different naming conventions and formats',
+    category: 'text',
+    icon: Type,
+    component: TextFormatterTool,
+    keywords: ['text', 'format', 'case', 'camel', 'snake', 'kebab', 'pascal', 'uppercase', 'lowercase', 'vietnamese', 'diacritics', 'trim', 'sort'],
   },
 ];
 
