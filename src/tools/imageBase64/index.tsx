@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, DragEvent } from 'react';
+import { useState, useRef, useCallback, DragEvent, useEffect } from 'react';
 import { Upload, Download, Image as ImageIcon, X } from 'lucide-react';
 import { ToolWrapper } from '../../components/ToolWrapper';
 import { Textarea } from '../../components/ui/Textarea';
@@ -23,6 +23,7 @@ export default function ImageBase64Tool() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState('');
   const [base64Output, setBase64Output] = useState('');
+  const [clipboardMessage, setClipboardMessage] = useState('');
 
   // from-base64 state
   const [b64Input, setB64Input] = useState('');
@@ -31,9 +32,11 @@ export default function ImageBase64Tool() {
 
   const processFile = useCallback(async (file: File) => {
     if (!file.type.startsWith('image/')) {
+      setClipboardMessage('No image found in clipboard.');
       return;
     }
     setImageFile(file);
+    setClipboardMessage('');
     const result = await fileToBase64(file);
     if (result.success) {
       setImagePreview(result.output);
@@ -52,6 +55,33 @@ export default function ImageBase64Tool() {
     const file = e.dataTransfer.files[0];
     if (file) processFile(file);
   };
+
+  useEffect(() => {
+    const handlePaste = (event: ClipboardEvent) => {
+      if (tab !== 'toBase64') return;
+
+      const items = event.clipboardData?.items;
+      if (!items || items.length === 0) {
+        setClipboardMessage('No image found in clipboard.');
+        return;
+      }
+
+      const imageItem = Array.from(items).find((item) => item.type.startsWith('image/'));
+      if (!imageItem) {
+        setClipboardMessage('No image found in clipboard.');
+        return;
+      }
+
+      event.preventDefault();
+      const file = imageItem.getAsFile();
+      if (file) {
+        void processFile(file);
+      }
+    };
+
+    window.addEventListener('paste', handlePaste);
+    return () => window.removeEventListener('paste', handlePaste);
+  }, [processFile, tab]);
 
   const handleB64Convert = () => {
     const res = base64ToImageSrc(b64Input);
@@ -128,6 +158,7 @@ export default function ImageBase64Tool() {
                   <div className="text-center">
                     <p className="text-sm text-zinc-300">Drop image here or click to browse</p>
                     <p className="text-xs text-zinc-500 mt-1">PNG, JPG, GIF, WebP supported</p>
+                    <p className="text-xs text-zinc-500 mt-1">Drag & Drop, Select File, or Paste (Ctrl + V)</p>
                   </div>
                   <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); fileRef.current?.click(); }}>
                     <Upload className="w-3.5 h-3.5" />
@@ -136,6 +167,9 @@ export default function ImageBase64Tool() {
                 </>
               )}
             </div>
+            {clipboardMessage && (
+              <p className="text-sm text-zinc-400">{clipboardMessage}</p>
+            )}
 
             {/* Base64 output */}
             {base64Output && (
