@@ -75,7 +75,7 @@ export default function JsonTool() {
               Validate
             </Button>
             <div className="ml-auto flex items-center gap-2">
-              <span className="text-xs text-zinc-500">Indent:</span>
+              <span className="text-xs text-faint">Indent:</span>
               {[2, 4].map((n) => (
                 <button
                   key={n}
@@ -83,7 +83,7 @@ export default function JsonTool() {
                   className={`text-xs px-2 py-1 rounded transition-colors ${
                     indent === n
                       ? 'bg-violet-600 text-white'
-                      : 'text-zinc-400 hover:text-zinc-200'
+                      : 'text-text-muted hover:text-secondary'
                   }`}
                 >
                   {n}
@@ -92,7 +92,7 @@ export default function JsonTool() {
             </div>
             <button
               onClick={() => setInput(SAMPLE)}
-              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+              className="text-xs text-text-muted hover:text-secondary transition-colors"
             >
               Load sample
             </button>

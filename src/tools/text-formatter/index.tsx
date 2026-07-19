@@ -102,7 +102,7 @@ line 1`;
               </Button>
               <button
                 onClick={handleLoadSample}
-                className="ml-auto text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+                className="ml-auto text-xs text-text-muted hover:text-secondary transition-colors"
               >
                 Load sample
               </button>

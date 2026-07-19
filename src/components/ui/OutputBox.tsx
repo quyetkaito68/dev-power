@@ -19,7 +19,7 @@ export function OutputBox({ label, value, error, success, className, mono = true
     <div className="flex flex-col gap-1.5 flex-1 min-h-0">
       <div className="flex items-center justify-between">
         {label && (
-          <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{label}</span>
+          <span className="text-xs font-medium text-text-muted uppercase tracking-wider">{label}</span>
         )}
         <div className="flex items-center gap-2 ml-auto">
           {actions}
@@ -34,7 +34,7 @@ export function OutputBox({ label, value, error, success, className, mono = true
       ) : (
         <div
           className={cn(
-            'flex-1 min-h-0 rounded-md border border-zinc-700/50 bg-zinc-900/50',
+            'flex-1 min-h-0 rounded-md border border/50 bg-surface/50',
             success && value && 'border-emerald-500/30 bg-emerald-500/5',
             className
           )}
@@ -44,7 +44,7 @@ export function OutputBox({ label, value, error, success, className, mono = true
               className={cn(
                 'h-full overflow-auto p-3 text-sm whitespace-pre-wrap break-all',
                 mono ? 'font-mono' : 'font-sans',
-                success && value ? 'text-emerald-300' : 'text-zinc-200'
+                success && value ? 'text-emerald-300' : 'text-secondary'
               )}
               style={{ minHeight: `${rows * 1.625}rem` }}
             >
@@ -52,7 +52,7 @@ export function OutputBox({ label, value, error, success, className, mono = true
             </pre>
           ) : (
             <div
-              className="flex items-center justify-center text-zinc-600 text-sm italic"
+              className="flex items-center justify-center text-placeholder text-sm italic"
               style={{ minHeight: `${rows * 1.625}rem` }}
             >
               Output will appear here

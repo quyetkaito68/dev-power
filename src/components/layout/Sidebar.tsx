@@ -22,10 +22,10 @@ export function Sidebar() {
 
   if (sidebarCollapsed) {
     return (
-      <aside className="w-12 border-r border-zinc-800 flex flex-col items-center py-3 gap-2 shrink-0">
+      <aside className="w-12 border-r border-strong flex flex-col items-center py-3 gap-2 shrink-0">
         <button
           onClick={toggleSidebar}
-          className="w-8 h-8 flex items-center justify-center rounded-md text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-md text-faint hover:text-secondary hover:bg-elevated transition-colors"
           title="Expand sidebar"
         >
           <ChevronRight className="w-4 h-4" />
@@ -43,7 +43,7 @@ export function Sidebar() {
                     'w-8 h-8 flex items-center justify-center rounded-md transition-colors',
                     isActive
                       ? 'bg-violet-600/20 text-violet-400'
-                      : 'text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800'
+                      : 'text-faint hover:text-secondary hover:bg-elevated'
                   )
                 }
               >
@@ -57,22 +57,22 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-60 border-r border-zinc-800 flex flex-col shrink-0 overflow-hidden">
+    <aside className="w-60 border-r border-strong flex flex-col shrink-0 overflow-hidden">
       {/* Search */}
-      <div className="p-3 border-b border-zinc-800">
+      <div className="p-3 border-b border-strong">
         <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-faint" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search tools..."
-            className="w-full h-8 bg-zinc-800/60 border border-zinc-700/50 rounded-md pl-8 pr-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-violet-500/50 transition-colors"
+            className="w-full h-8 bg-elevated/60 border border/50 rounded-md pl-8 pr-3 text-sm text-secondary placeholder:text-placeholder focus:outline-none focus:ring-1 focus:ring-violet-500/50 transition-colors"
           />
           {search && (
             <button
               onClick={() => setSearch('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-faint hover:text-secondary"
             >
               ×
             </button>
@@ -86,8 +86,8 @@ export function Sidebar() {
         {!search && recentTools.length > 0 && (
           <div className="mb-2">
             <div className="flex items-center gap-1.5 px-3 py-1.5">
-              <Clock className="w-3 h-3 text-zinc-600" />
-              <span className="text-xs font-semibold text-zinc-600 uppercase tracking-wider">Recent</span>
+              <Clock className="w-3 h-3 text-placeholder" />
+              <span className="text-xs font-semibold text-placeholder uppercase tracking-wider">Recent</span>
             </div>
             {recentTools
               .map((id) => tools.find((t) => t.id === id))
@@ -103,7 +103,7 @@ export function Sidebar() {
                         'flex items-center gap-2.5 mx-2 px-2 py-1.5 rounded-md text-sm transition-colors',
                         isActive
                           ? 'bg-violet-600/15 text-violet-300'
-                          : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60'
+                          : 'text-text-muted hover:text-secondary hover:bg-elevated/60'
                       )
                     }
                   >
@@ -112,7 +112,7 @@ export function Sidebar() {
                   </NavLink>
                 );
               })}
-            <div className="mx-3 mt-2 border-t border-zinc-800" />
+            <div className="mx-3 mt-2 border-t border-strong" />
           </div>
         )}
 
@@ -138,7 +138,7 @@ export function Sidebar() {
                         'flex items-center gap-2.5 mx-2 px-2 py-1.5 rounded-md text-sm transition-colors',
                         isActive
                           ? 'bg-violet-600/15 text-violet-300 border border-violet-500/20'
-                          : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60'
+                          : 'text-text-muted hover:text-secondary hover:bg-elevated/60'
                       )
                     }
                   >
@@ -153,16 +153,16 @@ export function Sidebar() {
 
         {filtered.length === 0 && (
           <div className="px-4 py-8 text-center">
-            <p className="text-sm text-zinc-600">No tools match "{search}"</p>
+            <p className="text-sm text-placeholder">No tools match "{search}"</p>
           </div>
         )}
       </nav>
 
       {/* Collapse button */}
-      <div className="border-t border-zinc-800 p-2">
+      <div className="border-t border-strong p-2">
         <button
           onClick={toggleSidebar}
-          className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-zinc-600 hover:text-zinc-400 hover:bg-zinc-800/50 transition-colors"
+          className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-placeholder hover:text-text-muted hover:bg-elevated/50 transition-colors"
         >
           <ChevronLeft className="w-3.5 h-3.5" />
           Collapse

@@ -122,7 +122,7 @@ export default function ImageBase64Tool() {
               className={`relative flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed cursor-pointer transition-colors p-8 ${
                 dragging
                   ? 'border-violet-500 bg-violet-500/5'
-                  : 'border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800/30'
+                  : 'border hover:border-muted hover:bg-elevated/30'
               }`}
             >
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
@@ -134,8 +134,8 @@ export default function ImageBase64Tool() {
                     className="max-h-40 max-w-full object-contain rounded"
                   />
                   <div className="flex items-center gap-3">
-                    <span className="text-sm text-zinc-300">{imageFile?.name}</span>
-                    <span className="text-xs text-zinc-500">{humanFileSize(imageFile?.size ?? 0)}</span>
+                    <span className="text-sm text-secondary">{imageFile?.name}</span>
+                    <span className="text-xs text-faint">{humanFileSize(imageFile?.size ?? 0)}</span>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -144,7 +144,7 @@ export default function ImageBase64Tool() {
                         setBase64Output('');
                         if (fileRef.current) fileRef.current.value = '';
                       }}
-                      className="text-zinc-500 hover:text-red-400 transition-colors"
+                      className="text-faint hover:text-red-400 transition-colors"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -152,13 +152,13 @@ export default function ImageBase64Tool() {
                 </>
               ) : (
                 <>
-                  <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center">
-                    <ImageIcon className="w-6 h-6 text-zinc-500" />
+                  <div className="w-12 h-12 rounded-full bg-elevated flex items-center justify-center">
+                    <ImageIcon className="w-6 h-6 text-faint" />
                   </div>
                   <div className="text-center">
-                    <p className="text-sm text-zinc-300">Drop image here or click to browse</p>
-                    <p className="text-xs text-zinc-500 mt-1">PNG, JPG, GIF, WebP supported</p>
-                    <p className="text-xs text-zinc-500 mt-1">Drag & Drop, Select File, or Paste (Ctrl + V)</p>
+                    <p className="text-sm text-secondary">Drop image here or click to browse</p>
+                    <p className="text-xs text-faint mt-1">PNG, JPG, GIF, WebP supported</p>
+                    <p className="text-xs text-faint mt-1">Drag & Drop, Select File, or Paste (Ctrl + V)</p>
                   </div>
                   <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); fileRef.current?.click(); }}>
                     <Upload className="w-3.5 h-3.5" />
@@ -168,16 +168,16 @@ export default function ImageBase64Tool() {
               )}
             </div>
             {clipboardMessage && (
-              <p className="text-sm text-zinc-400">{clipboardMessage}</p>
+              <p className="text-sm text-text-muted">{clipboardMessage}</p>
             )}
 
             {/* Base64 output */}
             {base64Output && (
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Base64 Output</span>
+                  <span className="text-xs font-medium text-text-muted uppercase tracking-wider">Base64 Output</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-zinc-500">{humanFileSize(base64Output.length)}</span>
+                    <span className="text-xs text-faint">{humanFileSize(base64Output.length)}</span>
                     <CopyButton text={base64Output} />
                   </div>
                 </div>
@@ -185,7 +185,7 @@ export default function ImageBase64Tool() {
                   readOnly
                   value={base64Output}
                   rows={5}
-                  className="w-full resize-none rounded-md border border-zinc-700/50 bg-zinc-900/50 px-3 py-2.5 text-xs text-zinc-300 font-mono focus:outline-none scrollbar-thin"
+                  className="w-full resize-none rounded-md border border/50 bg-surface/50 px-3 py-2.5 text-xs text-secondary font-mono focus:outline-none scrollbar-thin"
                 />
               </div>
             )}
@@ -208,11 +208,11 @@ export default function ImageBase64Tool() {
             </div>
 
             <div className="flex flex-col gap-3">
-              <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Image Preview</span>
+              <span className="text-xs font-medium text-text-muted uppercase tracking-wider">Image Preview</span>
               {imgError ? (
                 <OutputBox label="" value="" error={imgError} />
               ) : imageSrc ? (
-                <div className="flex-1 rounded-md border border-zinc-700/50 bg-zinc-900/50 flex flex-col items-center justify-center gap-3 p-4">
+                <div className="flex-1 rounded-md border border/50 bg-surface/50 flex flex-col items-center justify-center gap-3 p-4">
                   <img
                     src={imageSrc}
                     alt="Preview"
@@ -225,8 +225,8 @@ export default function ImageBase64Tool() {
                   </Button>
                 </div>
               ) : (
-                <div className="flex-1 rounded-md border border-zinc-700/50 bg-zinc-900/50 flex items-center justify-center min-h-[200px]">
-                  <p className="text-sm text-zinc-600 italic">Image preview will appear here</p>
+                <div className="flex-1 rounded-md border border/50 bg-surface/50 flex items-center justify-center min-h-[200px]">
+                  <p className="text-sm text-placeholder italic">Image preview will appear here</p>
                 </div>
               )}
             </div>

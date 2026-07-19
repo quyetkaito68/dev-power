@@ -145,10 +145,10 @@ export default function QrTool() {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-center py-16 rounded-lg border border-dashed border-zinc-700">
+              <div className="flex items-center justify-center py-16 rounded-lg border border-dashed border">
                 <div className="text-center">
-                  <QrCode className="w-12 h-12 text-zinc-700 mx-auto mb-2" />
-                  <p className="text-sm text-zinc-600">QR code will appear here</p>
+                  <QrCode className="w-12 h-12 text-muted mx-auto mb-2" />
+                  <p className="text-sm text-placeholder">QR code will appear here</p>
                 </div>
               </div>
             )}
@@ -168,23 +168,23 @@ export default function QrTool() {
               }}
               onClick={() => fileRef.current?.click()}
               className={`flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed cursor-pointer transition-colors p-8 ${
-                dragging ? 'border-violet-500 bg-violet-500/5' : 'border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800/30'
+                dragging ? 'border-violet-500 bg-violet-500/5' : 'border hover:border-muted hover:bg-elevated/30'
               }`}
             >
-              <Upload className="w-8 h-8 text-zinc-500" />
-              <p className="text-sm text-zinc-300">Drop image with QR code here or click to browse</p>
+              <Upload className="w-8 h-8 text-faint" />
+              <p className="text-sm text-secondary">Drop image with QR code here or click to browse</p>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-zinc-800" />
-              <span className="text-xs text-zinc-500">or</span>
-              <div className="flex-1 h-px bg-zinc-800" />
+              <div className="flex-1 h-px bg-elevated" />
+              <span className="text-xs text-faint">or</span>
+              <div className="flex-1 h-px bg-elevated" />
             </div>
 
             {/* Webcam */}
             {scanning ? (
               <div className="flex flex-col items-center gap-3">
-                <div className="relative rounded-lg overflow-hidden border border-zinc-700">
+                <div className="relative rounded-lg overflow-hidden border border">
                   <video ref={videoRef} className="w-full max-w-sm block" playsInline muted />
                   <div className="absolute inset-0 border-2 border-violet-500/50 rounded-lg pointer-events-none" />
                 </div>
@@ -192,7 +192,7 @@ export default function QrTool() {
                   <X className="w-3.5 h-3.5" />
                   Stop Camera
                 </Button>
-                <p className="text-xs text-zinc-500">Point camera at a QR code</p>
+                <p className="text-xs text-faint">Point camera at a QR code</p>
               </div>
             ) : (
               <Button variant="outline" onClick={startWebcam} className="self-start">

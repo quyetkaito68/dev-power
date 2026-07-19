@@ -15,10 +15,10 @@ export function ToolWrapper({ title, description, category, children }: ToolWrap
       <div className="flex items-start justify-between gap-4 shrink-0">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-xl font-bold text-zinc-100 tracking-tight">{title}</h1>
+            <h1 className="text-xl font-bold text-primary tracking-tight">{title}</h1>
             <Badge category={category} />
           </div>
-          <p className="text-sm text-zinc-400">{description}</p>
+          <p className="text-sm text-text-muted">{description}</p>
         </div>
       </div>
       {children}

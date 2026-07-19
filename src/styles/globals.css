@@ -3,20 +3,47 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    @apply border-zinc-700/50;
+  :root {
+    --color-bg: 240 5.9% 98%;
+    --color-surface: 240 4.8% 95.9%;
+    --color-elevated: 240 5.9% 92%;
+    --color-muted: 240 3.8% 85%;
+    --color-border: 240 3.8% 80%;
+    --color-border-strong: 240 3.8% 72%;
+    --color-text: 240 10% 4%;
+    --color-text-secondary: 240 10% 10%;
+    --color-text-muted: 240 3.8% 40%;
+    --color-text-faint: 240 3.8% 50%;
+    --color-text-placeholder: 240 3.8% 60%;
+  }
+
+  .dark {
+    --color-bg: 240 5.9% 3%;
+    --color-surface: 240 6% 10%;
+    --color-elevated: 240 5.3% 15%;
+    --color-muted: 240 3.7% 20%;
+    --color-border: 240 3.7% 20%;
+    --color-border-strong: 240 5.3% 25%;
+    --color-text: 0 0% 98%;
+    --color-text-secondary: 0 0% 85%;
+    --color-text-muted: 240 3.7% 40%;
+    --color-text-faint: 240 5% 50%;
+    --color-text-placeholder: 240 3.8% 60%;
   }
 
   html {
-    @apply bg-zinc-950 text-zinc-100;
-  }
-
-  html.light {
-    @apply bg-zinc-50 text-zinc-900;
+    @apply antialiased;
+    background-color: hsl(var(--color-bg));
+    color: hsl(var(--color-text));
   }
 
   body {
-    @apply font-mono antialiased;
+    @apply font-mono;
+  }
+
+  * {
+    @apply border-zinc-700/50;
+    border-color: hsl(var(--color-border) / 0.5);
   }
 
   ::-webkit-scrollbar {

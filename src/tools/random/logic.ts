@@ -1,4 +1,4 @@
-import type { RandomColor, RandomTextCharset, PhoneFormat } from './types';
+import type { RandomColor, RandomTextCharset, PhoneFormat, ResultFormat } from './types';
 
 const ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 const ALPHANUM = ALPHA + '0123456789';
@@ -83,4 +83,18 @@ export function randomNumber(min: number, max: number, decimals = 0): string {
 
 export function randomBoolean(): boolean {
   return Math.random() > 0.5;
+}
+
+export function formatResults(values: string[], format: ResultFormat): string {
+  switch (format) {
+    case 'space':
+      return values.join(' ');
+    case 'semicolon':
+      return values.join('; ');
+    case 'list':
+      return `(${values.map((v) => `'${v}'`).join(', ')})`;
+    case 'newline':
+    default:
+      return values.join('\n');
+  }
 }

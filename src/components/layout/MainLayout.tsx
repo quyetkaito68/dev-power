@@ -14,7 +14,7 @@ function LoadingFallback() {
 
 export function MainLayout() {
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-zinc-950 dark:bg-zinc-950">
+    <div className="h-screen flex flex-col overflow-hidden bg-page">
       <Header />
       <div className="flex flex-1 min-h-0">
         <Sidebar />

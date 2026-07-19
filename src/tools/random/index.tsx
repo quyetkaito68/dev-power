@@ -3,9 +3,10 @@ import { RefreshCw } from 'lucide-react';
 import { ToolWrapper } from '../../components/ToolWrapper';
 import { Button } from '../../components/ui/Button';
 import { Select } from '../../components/ui/Select';
+import { Input } from '../../components/ui/Input';
 import { CopyButton } from '../../components/ui/CopyButton';
-import { randomText, randomEmail, randomPhone, randomUUID, randomColor } from './logic';
-import type { RandomTextCharset, PhoneFormat } from './types';
+import { randomText, randomEmail, randomPhone, randomUUID, randomColor, randomNumber, formatResults } from './logic';
+import type { RandomTextCharset, PhoneFormat, ResultFormat } from './types';
 
 interface ResultRowProps {
   label: string;
@@ -17,16 +18,16 @@ interface ResultRowProps {
 function ResultRow({ label, value, accent, children }: ResultRowProps) {
   if (!value) return null;
   return (
-    <div className="flex items-center gap-3 py-2.5 px-3 rounded-md bg-zinc-800/40 border border-zinc-700/30">
+    <div className="flex items-center gap-3 py-2.5 px-3 rounded-md bg-elevated/40 border border/30">
       {accent && (
         <div
-          className="w-6 h-6 rounded-md shrink-0 border border-zinc-700/50"
+          className="w-6 h-6 rounded-md shrink-0 border border/50"
           style={{ backgroundColor: accent }}
         />
       )}
       <div className="flex-1 min-w-0">
-        <span className="text-xs text-zinc-500 block mb-0.5">{label}</span>
-        <span className="text-sm text-zinc-200 font-mono break-all">{value}</span>
+        <span className="text-xs text-faint block mb-0.5">{label}</span>
+        <span className="text-sm text-secondary font-mono break-all whitespace-pre-line">{value}</span>
       </div>
       <div className="flex items-center gap-1 shrink-0">
         {children}
@@ -41,6 +42,11 @@ export default function RandomTool() {
   const [textCharset, setTextCharset] = useState<RandomTextCharset>('alphanumeric');
   const [phoneFormat, setPhoneFormat] = useState<PhoneFormat>('vn');
 
+  const [numMin, setNumMin] = useState(0);
+  const [numMax, setNumMax] = useState(100);
+  const [numDecimals, setNumDecimals] = useState(0);
+  const [numResult, setNumResult] = useState('');
+
   const [textResult, setTextResult] = useState('');
   const [emailResult, setEmailResult] = useState('');
   const [phoneResult, setPhoneResult] = useState('');
@@ -48,9 +54,10 @@ export default function RandomTool() {
   const [colorResult, setColorResult] = useState<{ hex: string; rgb: string; hsl: string } | null>(null);
 
   const [count, setCount] = useState(1);
+  const [formatResult, setFormatResult] = useState<ResultFormat>('newline');
 
   const multiGenerate = (fn: () => string, n: number) =>
-    Array.from({ length: n }, fn).join('\n');
+    formatResults(Array.from({ length: n }, fn), formatResult);
 
   return (
     <ToolWrapper
@@ -59,11 +66,15 @@ export default function RandomTool() {
       category="generator"
     >
       <div className="flex flex-col gap-6">
+        <div className="flex flex-wrap items-end gap-3 p-4 rounded-lg border border/40 bg-surface/30">
+          <FormatSelect value={formatResult} onChange={setFormatResult} />
+        </div>
+
         {/* Text */}
         <Section title="Random Text">
           <div className="flex flex-wrap items-end gap-3">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Length</label>
+              <label className="text-xs font-medium text-text-muted uppercase tracking-wider">Length</label>
               <div className="flex items-center gap-2">
                 <input
                   type="range"
@@ -73,7 +84,7 @@ export default function RandomTool() {
                   onChange={(e) => setTextLength(Number(e.target.value))}
                   className="w-32 accent-violet-500"
                 />
-                <span className="text-sm text-zinc-300 w-8 text-right tabular-nums">{textLength}</span>
+                <span className="text-sm text-secondary w-8 text-right tabular-nums">{textLength}</span>
               </div>
             </div>
             <Select
@@ -93,6 +104,46 @@ export default function RandomTool() {
             </Button>
           </div>
           {textResult && <ResultRow label="Random text" value={textResult} />}
+        </Section>
+
+        {/* Number */}
+        <Section title="Random Number">
+          <div className="flex flex-wrap items-end gap-3">
+            <Input
+              label="Min"
+              type="number"
+              value={numMin}
+              onChange={(e) => setNumMin(Number(e.target.value))}
+              className="w-24"
+            />
+            <Input
+              label="Max"
+              type="number"
+              value={numMax}
+              onChange={(e) => setNumMax(Number(e.target.value))}
+              className="w-24"
+            />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-text-muted uppercase tracking-wider">Decimals</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="range"
+                  min={0}
+                  max={10}
+                  value={numDecimals}
+                  onChange={(e) => setNumDecimals(Number(e.target.value))}
+                  className="w-24 accent-violet-500"
+                />
+                <span className="text-sm text-secondary w-5 text-right tabular-nums">{numDecimals}</span>
+              </div>
+            </div>
+            <CountSelect value={count} onChange={setCount} />
+            <Button onClick={() => setNumResult(multiGenerate(() => randomNumber(numMin, numMax, numDecimals), count))}>
+              <RefreshCw className="w-3.5 h-3.5" />
+              Generate
+            </Button>
+          </div>
+          {numResult && <ResultRow label="Random number" value={numResult} />}
         </Section>
 
         {/* Email */}
@@ -162,8 +213,8 @@ export default function RandomTool() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-3 p-4 rounded-lg border border-zinc-700/40 bg-zinc-900/30">
-      <h3 className="text-sm font-semibold text-zinc-300">{title}</h3>
+    <div className="flex flex-col gap-3 p-4 rounded-lg border border/40 bg-surface/30">
+      <h3 className="text-sm font-semibold text-secondary">{title}</h3>
       {children}
     </div>
   );
@@ -180,6 +231,22 @@ function CountSelect({ value, onChange }: { value: number; onChange: (n: number)
         { value: '5', label: '5' },
         { value: '10', label: '10' },
         { value: '20', label: '20' },
+      ]}
+    />
+  );
+}
+
+function FormatSelect({ value, onChange }: { value: ResultFormat; onChange: (f: ResultFormat) => void }) {
+  return (
+    <Select
+      label="Output format"
+      value={value}
+      onChange={(e) => onChange(e.target.value as ResultFormat)}
+      options={[
+        { value: 'newline', label: 'Newline' },
+        { value: 'space', label: 'Space' },
+        { value: 'semicolon', label: 'Semicolon' },
+        { value: 'list', label: "List ('a', 'b')" },
       ]}
     />
   );

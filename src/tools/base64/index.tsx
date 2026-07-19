@@ -106,7 +106,7 @@ export default function Base64Tool() {
           <Button onClick={run}>Convert</Button>
           <button
             onClick={() => { setInput(''); setResult(null); }}
-            className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+            className="text-xs text-text-muted hover:text-secondary transition-colors"
           >
             Clear
           </button>
