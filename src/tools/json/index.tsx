@@ -1,9 +1,11 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Play, Minimize2, CheckCircle } from 'lucide-react';
 import { ToolWrapper } from '../../components/ToolWrapper';
 import { Textarea } from '../../components/ui/Textarea';
 import { Button } from '../../components/ui/Button';
 import { OutputBox } from '../../components/ui/OutputBox';
+import { Tabs } from '../../components/ui/Tabs';
+import { JsonTreeView } from './JsonTreeView';
 import { formatJson, minifyJson, validateJson } from './logic';
 import type { JsonResult } from './types';
 
@@ -22,6 +24,17 @@ export default function JsonTool() {
   const [input, setInput] = useState('');
   const [indent, setIndent] = useState(2);
   const [result, setResult] = useState<JsonResult | null>(null);
+  const [viewMode, setViewMode] = useState<'text' | 'viewer'>('text');
+
+  const parsedData = useMemo(() => {
+    const trimmed = input.trim();
+    if (!trimmed) return null;
+    try {
+      return JSON.parse(trimmed);
+    } catch {
+      return null;
+    }
+  }, [input]);
 
   const run = useCallback(
     (action: 'format' | 'minify' | 'validate') => {
@@ -100,13 +113,32 @@ export default function JsonTool() {
         </div>
 
         {/* Output */}
-        <OutputBox
-          label="Output"
-          value={result?.output ?? ''}
-          error={result?.success === false ? result.error : undefined}
-          success={result?.success}
-          rows={12}
-        />
+        <div className="flex flex-col min-h-0 flex-1">
+          <Tabs
+            tabs={[
+              { id: 'text', label: 'Text' },
+              { id: 'viewer', label: 'Viewer' },
+            ]}
+            active={viewMode}
+            onChange={(id) => setViewMode(id as 'text' | 'viewer')}
+            className="mb-2"
+          />
+          {viewMode === 'text' ? (
+            <OutputBox
+              label="Output"
+              value={result?.output ?? ''}
+              error={result?.success === false ? result.error : undefined}
+              success={result?.success}
+              rows={12}
+            />
+          ) : parsedData !== null ? (
+            <JsonTreeView data={parsedData} />
+          ) : (
+            <div className="flex-1 rounded-md border border/50 bg-surface/50 flex items-center justify-center text-placeholder text-sm italic min-h-[280px]">
+              Paste valid JSON to view tree
+            </div>
+          )}
+        </div>
       </div>
     </ToolWrapper>
   );
