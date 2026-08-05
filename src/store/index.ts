@@ -11,6 +11,8 @@ interface AppState {
   setSidebarCollapsed: (collapsed: boolean) => void;
   commandPaletteOpen: boolean;
   setCommandPaletteOpen: (open: boolean) => void;
+  contextText: string;
+  setContextText: (text: string) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -38,10 +40,12 @@ export const useAppStore = create<AppState>()(
 
       commandPaletteOpen: false,
       setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
+      contextText: '',
+      setContextText: (text) => set({ contextText: text }),
     }),
     {
       name: 'devpower-settings',
-      partialize: (s) => ({ isDark: s.isDark, recentTools: s.recentTools, sidebarCollapsed: s.sidebarCollapsed }),
+      partialize: (s) => ({ isDark: s.isDark, recentTools: s.recentTools, sidebarCollapsed: s.sidebarCollapsed, contextText: s.contextText }),
     }
   )
 );

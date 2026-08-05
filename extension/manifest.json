@@ -3,7 +3,7 @@
   "name": "DevPower",
   "version": "1.0.0",
   "description": "Developer utility toolbox as a Chrome Extension",
-  "permissions": ["storage", "activeTab", "scripting", "sidePanel", "tabs"],
+  "permissions": ["storage", "activeTab", "scripting", "sidePanel", "tabs", "contextMenus", "clipboardWrite"],
   "host_permissions": ["<all_urls>"],
   "action": {
     "default_title": "DevPower",
