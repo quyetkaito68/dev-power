@@ -1,5 +1,7 @@
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { MainLayout } from '../../../components/layout/MainLayout';
+import { CommandPalette } from '../../../components/CommandPalette';
 import { WelcomePage, ToolLoader } from '../../../app/router';
 import { useAppStore } from '../../../store';
 
@@ -24,10 +26,13 @@ export default function SidePanelApp() {
   return (
     <div className="min-h-screen h-full w-full bg-page text-primary">
       <HashRouter>
+        <CommandPalette />
         <Routes>
-          <Route path="/" element={<WelcomePage />} />
-          <Route path="tool/:id" element={<ToolLoader />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<WelcomePage />} />
+            <Route path="tool/:id" element={<ToolLoader />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
         </Routes>
       </HashRouter>
     </div>
