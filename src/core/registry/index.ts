@@ -1,9 +1,10 @@
 import { lazy } from 'react';
-import { Braces, ArrowLeftRight, Image, QrCode, Shuffle, Type } from 'lucide-react';
+import { Braces, ArrowLeftRight, Image, QrCode, Shuffle, Type, Lock } from 'lucide-react';
 import type { Tool } from '../types';
 
 const JsonTool = lazy(() => import('../../tools/json'));
 const Base64Tool = lazy(() => import('../../tools/base64'));
+const SecretKeyTool = lazy(() => import('../../tools/secret-key'));
 const ImageBase64Tool = lazy(() => import('../../tools/imageBase64'));
 const QrTool = lazy(() => import('../../tools/qr'));
 const RandomTool = lazy(() => import('../../tools/random'));
@@ -27,6 +28,15 @@ export const tools: Tool[] = [
     icon: ArrowLeftRight,
     component: Base64Tool,
     keywords: ['base64', 'encode', 'decode', 'text', 'utf8', 'binary'],
+  },
+  {
+    id: 'secret-key',
+    name: 'Secret Key Encryptor',
+    description: 'Encrypt and decrypt text with a secret key using browser-side AES-GCM',
+    category: 'encoder',
+    icon: Lock,
+    component: SecretKeyTool,
+    keywords: ['secret', 'key', 'encrypt', 'decrypt', 'aes', 'gcm', 'password', 'privacy'],
   },
   {
     id: 'image-base64',
