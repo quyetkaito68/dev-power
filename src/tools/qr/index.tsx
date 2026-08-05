@@ -1,11 +1,11 @@
 import { useState, useRef, useCallback, useEffect, DragEvent } from 'react';
-import { Download, QrCode, Camera, Upload, X, RefreshCw } from 'lucide-react';
+import { Download, QrCode, Camera, Upload, X, Copy } from 'lucide-react';
 import { ToolWrapper } from '../../components/ToolWrapper';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { Tabs } from '../../components/ui/Tabs';
 import { CopyButton } from '../../components/ui/CopyButton';
-import { generateQR, downloadQR, scanQRFromFile, scanQRFromWebcam } from './logic';
+import { generateQR, downloadQR, copyQRImageToClipboard, scanQRFromFile, scanQRFromWebcam } from './logic';
 import type { QrTab } from './types';
 
 const TABS = [
@@ -20,6 +20,11 @@ export default function QrTool() {
   const [text, setText] = useState('');
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [genError, setGenError] = useState('');
+  const [copying, setCopying] = useState(false);
+  const [copyError, setCopyError] = useState('');
+  const [pasteError, setPasteError] = useState('');
+  const [imagePreview, setImagePreview] = useState('');
+  const [imageFileName, setImageFileName] = useState('');
   const [size] = useState(280);
 
   // Scan state
@@ -47,6 +52,19 @@ export default function QrTool() {
       setGenError(res.error ?? 'Failed to generate QR code');
     }
   }, [text, size]);
+
+  const handleCopyImage = useCallback(async () => {
+    if (!qrDataUrl) return;
+    setCopying(true);
+    setCopyError('');
+    try {
+      await copyQRImageToClipboard(qrDataUrl);
+    } catch (error) {
+      setCopyError((error as Error).message || 'Unable to copy QR image');
+    } finally {
+      setCopying(false);
+    }
+  }, [qrDataUrl]);
 
   // Auto-generate on text change
   useEffect(() => {
@@ -94,13 +112,59 @@ export default function QrTool() {
     }
   };
 
-  const handleScanFile = async (file: File) => {
+  const createImagePreview = useCallback((file: File) => new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(new Error('Unable to read image'));
+    reader.readAsDataURL(file);
+  }), []);
+
+  const handleScanFile = useCallback(async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setScanError('Please select an image file');
+      setImagePreview('');
+      setImageFileName('');
+      return;
+    }
+
     setScanResult('');
     setScanError('');
+    setPasteError('');
+
+    try {
+      const preview = await createImagePreview(file);
+      setImagePreview(preview);
+      setImageFileName(file.name);
+    } catch {
+      setImagePreview('');
+      setImageFileName('');
+    }
+
     const result = await scanQRFromFile(file);
     if (result) setScanResult(result);
     else setScanError('No QR code found in the image');
-  };
+  }, [createImagePreview]);
+
+  useEffect(() => {
+    const handlePaste = (event: ClipboardEvent) => {
+      if (tab !== 'scan') return;
+
+      const items = event.clipboardData?.items;
+      if (!items || items.length === 0) return;
+
+      const imageItem = Array.from(items).find((item) => item.type.startsWith('image/'));
+      if (!imageItem) return;
+
+      event.preventDefault();
+      const file = imageItem.getAsFile();
+      if (file) {
+        void handleScanFile(file);
+      }
+    };
+
+    window.addEventListener('paste', handlePaste);
+    return () => window.removeEventListener('paste', handlePaste);
+  }, [handleScanFile, tab]);
 
   useEffect(() => () => stopWebcam(), [stopWebcam]);
 
@@ -138,11 +202,14 @@ export default function QrTool() {
                     <Download className="w-3.5 h-3.5" />
                     Download PNG
                   </Button>
-                  <Button variant="outline" onClick={handleGenerate}>
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    Regenerate
+                  <Button variant="outline" onClick={handleCopyImage} disabled={copying}>
+                    <Copy className="w-3.5 h-3.5" />
+                    {copying ? 'Copying...' : 'Copy PNG'}
                   </Button>
                 </div>
+                {copyError && (
+                  <p className="text-sm text-red-400">{copyError}</p>
+                )}
               </div>
             ) : (
               <div className="flex items-center justify-center py-16 rounded-lg border border-dashed border">
@@ -164,15 +231,51 @@ export default function QrTool() {
                 e.preventDefault();
                 setDragging(false);
                 const f = e.dataTransfer.files[0];
-                if (f) handleScanFile(f);
+                if (f) void handleScanFile(f);
+              }}
+              onPaste={(e) => {
+                const clipboardItems = Array.from(e.clipboardData?.items ?? []);
+                const imageItem = clipboardItems.find((item) => item.type.startsWith('image/'));
+                if (imageItem) {
+                  e.preventDefault();
+                  const file = imageItem.getAsFile();
+                  if (file) void handleScanFile(file);
+                }
               }}
               onClick={() => fileRef.current?.click()}
               className={`flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed cursor-pointer transition-colors p-8 ${
                 dragging ? 'border-violet-500 bg-violet-500/5' : 'border hover:border-muted hover:bg-elevated/30'
               }`}
             >
-              <Upload className="w-8 h-8 text-faint" />
-              <p className="text-sm text-secondary">Drop image with QR code here or click to browse</p>
+              {imagePreview ? (
+                <>
+                  <img src={imagePreview} alt="QR preview" className="max-h-40 max-w-full object-contain rounded" />
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-secondary">{imageFileName || 'Image preview'}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setImagePreview('');
+                        setImageFileName('');
+                        setScanResult('');
+                        setScanError('');
+                        setPasteError('');
+                      }}
+                      className="text-faint hover:text-red-400 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Upload className="w-8 h-8 text-faint" />
+                  <div className="text-center">
+                    <p className="text-sm text-secondary">Drop image with QR code here or click to browse</p>
+                    <p className="text-xs text-faint mt-1">Paste (Ctrl+V), drag & drop, or browse</p>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="flex items-center gap-3">
@@ -180,6 +283,10 @@ export default function QrTool() {
               <span className="text-xs text-faint">or</span>
               <div className="flex-1 h-px bg-elevated" />
             </div>
+
+            {pasteError && (
+              <p className="text-sm text-red-400">{pasteError}</p>
+            )}
 
             {/* Webcam */}
             {scanning ? (
@@ -208,22 +315,24 @@ export default function QrTool() {
               </div>
             )}
             {scanResult && (
-              <div className="rounded-md border border-emerald-500/30 bg-emerald-500/5 p-4">
-                <div className="flex items-center justify-between mb-2">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
                   <span className="text-xs font-medium text-emerald-400 uppercase tracking-wider">QR Content Detected</span>
                   <CopyButton text={scanResult} />
                 </div>
-                <p className="text-sm text-emerald-300 font-mono break-all">{scanResult}</p>
-                {scanResult.startsWith('http') && (
-                  <a
-                    href={scanResult}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-block text-xs text-violet-400 hover:text-violet-300 underline"
-                  >
-                    Open URL →
-                  </a>
-                )}
+                <div className="rounded-md border border-emerald-500/30 bg-emerald-500/5 p-4">
+                  <p className="text-sm text-emerald-300 font-mono break-all">{scanResult}</p>
+                  {scanResult.startsWith('http') && (
+                    <a
+                      href={scanResult}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-block text-xs text-violet-400 hover:text-violet-300 underline"
+                    >
+                      Open URL →
+                    </a>
+                  )}
+                </div>
               </div>
             )}
           </div>

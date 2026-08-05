@@ -26,6 +26,38 @@ export function downloadQR(dataUrl: string, filename = 'qrcode') {
   document.body.removeChild(a);
 }
 
+export async function copyQRImageToClipboard(dataUrl: string): Promise<void> {
+  if (!dataUrl) throw new Error('No QR image available');
+  if (typeof navigator === 'undefined' || !navigator.clipboard?.write) {
+    throw new Error('Clipboard API is not available in this browser');
+  }
+  if (typeof ClipboardItem === 'undefined') {
+    throw new Error('Clipboard image copy is not supported in this browser');
+  }
+
+  const response = await fetch(dataUrl);
+  const blob = await response.blob();
+  await navigator.clipboard.write([new ClipboardItem({ [blob.type || 'image/png']: blob })]);
+}
+
+export async function scanQRFromClipboard(): Promise<string | null> {
+  if (typeof navigator === 'undefined' || !navigator.clipboard?.read) {
+    throw new Error('Clipboard API is not available in this browser');
+  }
+
+  const items = await navigator.clipboard.read();
+  for (const item of items) {
+    const imageType = Array.from(item.types).find((type) => type.startsWith('image/'));
+    if (!imageType) continue;
+
+    const blob = await item.getType(imageType);
+    const file = new File([blob], `clipboard-${Date.now()}.${imageType.split('/')[1] || 'png'}`, { type: imageType });
+    return scanQRFromFile(file);
+  }
+
+  return null;
+}
+
 export function scanQRFromFile(file: File): Promise<string | null> {
   return new Promise((resolve) => {
     const reader = new FileReader();
