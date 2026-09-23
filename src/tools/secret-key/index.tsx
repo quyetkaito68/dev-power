@@ -20,14 +20,17 @@ export default function SecretKeyTool() {
   const [result, setResult] = useState<SecretKeyResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const run = useCallback(async () => {
-    setIsLoading(true);
-    if (mode === 'encrypt') {
-      setResult(await encryptWithSecretKey(input, secretKey));
-    } else {
-      setResult(await decryptWithSecretKey(input, secretKey));
+  const run = useCallback(async (showLoading = true) => {
+    if (showLoading) setIsLoading(true);
+    try {
+      if (mode === 'encrypt') {
+        setResult(await encryptWithSecretKey(input, secretKey));
+      } else {
+        setResult(await decryptWithSecretKey(input, secretKey));
+      }
+    } finally {
+      if (showLoading) setIsLoading(false);
     }
-    setIsLoading(false);
   }, [input, mode, secretKey]);
 
   useEffect(() => {
@@ -46,6 +49,14 @@ export default function SecretKeyTool() {
       setResult(null);
     }
   }, [input, secretKey]);
+
+  useEffect(() => {
+    if (input && secretKey && input.length < 10000) {
+      void run(false);
+    } else if (!input || !secretKey) {
+      setResult(null);
+    }
+  }, [input, secretKey, mode, run]);
 
   return (
     <ToolWrapper
@@ -84,7 +95,7 @@ export default function SecretKeyTool() {
 
         <div className="flex items-center gap-2">
           <Button onClick={() => void run()} disabled={isLoading}>
-            {isLoading ? 'Processing...' : mode === 'encrypt' ? 'Encrypt' : 'Decrypt'}
+            {mode === 'encrypt' ? 'Encrypt' : 'Decrypt'}
           </Button>
           <button
             onClick={() => {
