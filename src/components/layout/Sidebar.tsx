@@ -6,9 +6,16 @@ import { CATEGORIES } from '../../core/types';
 import { useAppStore } from '../../store';
 import { cn } from '../../core/utils/cn';
 
-export function Sidebar() {
+interface SidebarProps {
+  collapsed?: boolean;
+  onToggle?: () => void;
+}
+
+export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const [search, setSearch] = useState('');
   const { sidebarCollapsed, toggleSidebar } = useAppStore();
+  const isCollapsed = collapsed ?? sidebarCollapsed;
+  const handleToggle = onToggle ?? toggleSidebar;
 
   const filtered = search.trim()
     ? tools.filter(
@@ -20,7 +27,7 @@ export function Sidebar() {
 
   const grouped = groupByCategory(filtered);
 
-  if (sidebarCollapsed) {
+  if (isCollapsed) {
     return (
       <aside className="w-12 border-r border-strong flex flex-col items-center py-3 gap-2 shrink-0">
         <div className="flex flex-col gap-1 mt-2 flex-1">
@@ -46,7 +53,7 @@ export function Sidebar() {
           })}
         </div>
         <button
-          onClick={toggleSidebar}
+          onClick={handleToggle}
           className="mt-auto w-8 h-8 flex items-center justify-center rounded-md text-faint hover:text-secondary hover:bg-elevated transition-colors"
           title="Expand sidebar"
         >
@@ -127,7 +134,7 @@ export function Sidebar() {
       {/* Collapse button */}
       <div className="border-t border-strong p-2">
         <button
-          onClick={toggleSidebar}
+          onClick={handleToggle}
           className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-placeholder hover:text-text-muted hover:bg-elevated/50 transition-colors"
         >
           <ChevronLeft className="w-3.5 h-3.5" />

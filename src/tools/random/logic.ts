@@ -1,4 +1,4 @@
-import type { RandomColor, RandomTextCharset, PhoneFormat, ResultFormat } from './types';
+import type { RandomColor, RandomTextCharset, PhoneFormat, ResultFormat, UUIDVersion } from './types';
 
 const ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 const ALPHANUM = ALPHA + '0123456789';
@@ -40,8 +40,23 @@ export function randomPhone(format: PhoneFormat = 'vn'): string {
   }
 }
 
-export function randomUUID(): string {
-  if (typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+export function randomUUID(version: UUIDVersion = 'v4'): string {
+  if (version === 'v4' && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+
+  if (version === 'v7') {
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    let timestamp = Date.now();
+    for (let index = 5; index >= 0; index -= 1) {
+      bytes[index] = timestamp & 0xff;
+      timestamp = Math.floor(timestamp / 256);
+    }
+    bytes[6] = (bytes[6] & 0x0f) | 0x70;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+    const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
     const v = c === 'x' ? r : (r & 0x3) | 0x8;

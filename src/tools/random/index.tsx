@@ -6,7 +6,9 @@ import { Select } from '../../components/ui/Select';
 import { Input } from '../../components/ui/Input';
 import { CopyButton } from '../../components/ui/CopyButton';
 import { randomText, randomEmail, randomPhone, randomUUID, randomColor, randomNumber, formatResults } from './logic';
-import type { RandomTextCharset, PhoneFormat, ResultFormat } from './types';
+import type { RandomTextCharset, PhoneFormat, ResultFormat, UUIDVersion } from './types';
+
+type RandomType = 'uuid' | 'text' | 'number' | 'email' | 'phone' | 'color';
 
 interface ResultRowProps {
   label: string;
@@ -18,7 +20,7 @@ interface ResultRowProps {
 function ResultRow({ label, value, accent, children }: ResultRowProps) {
   if (!value) return null;
   return (
-    <div className="flex items-center gap-3 py-2.5 px-3 rounded-md bg-elevated/40 border border/30">
+    <div className="flex w-full max-w-lg items-start gap-3 py-2.5 px-3 rounded-md bg-elevated/40 border border/30">
       {accent && (
         <div
           className="w-6 h-6 rounded-md shrink-0 border border/50"
@@ -29,18 +31,20 @@ function ResultRow({ label, value, accent, children }: ResultRowProps) {
         <span className="text-xs text-faint block mb-0.5">{label}</span>
         <span className="text-sm text-secondary font-mono break-all whitespace-pre-line">{value}</span>
       </div>
-      <div className="flex items-center gap-1 shrink-0">
+      <div className="flex shrink-0 items-start gap-1">
         {children}
-        <CopyButton text={value} />
+        <CopyButton text={value} className="shrink-0" />
       </div>
     </div>
   );
 }
 
 export default function RandomTool() {
+  const [randomType, setRandomType] = useState<RandomType>('uuid');
   const [textLength, setTextLength] = useState(32);
   const [textCharset, setTextCharset] = useState<RandomTextCharset>('alphanumeric');
   const [phoneFormat, setPhoneFormat] = useState<PhoneFormat>('vn');
+  const [uuidVersion, setUuidVersion] = useState<UUIDVersion>('v7');
 
   const [numMin, setNumMin] = useState(0);
   const [numMax, setNumMax] = useState(100);
@@ -65,13 +69,26 @@ export default function RandomTool() {
       description="Generate random strings, emails, phone numbers, UUIDs, and colors."
       category="generator"
     >
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-wrap items-end gap-3 p-4 rounded-lg border border/40 bg-surface/30">
+      <div className="flex flex-col items-start gap-4">
+        <Select
+          containerClassName="w-48"
+          label="Random type"
+          value={randomType}
+          onChange={(e) => setRandomType(e.target.value as RandomType)}
+          options={[
+            { value: 'uuid', label: 'UUID' },
+            { value: 'text', label: 'Random Text' },
+            { value: 'number', label: 'Random Number' },
+            { value: 'email', label: 'Email' },
+            { value: 'phone', label: 'Phone' },
+            { value: 'color', label: 'Color' },
+          ]}
+        />
+        {randomType !== 'color' && (
           <FormatSelect value={formatResult} onChange={setFormatResult} />
-        </div>
+        )}
 
-        {/* Text */}
-        <Section title="Random Text">
+        {randomType === 'text' && <Section title="Random Text">
           <div className="flex flex-wrap items-end gap-3">
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-medium text-text-muted uppercase tracking-wider">Length</label>
@@ -104,24 +121,23 @@ export default function RandomTool() {
             </Button>
           </div>
           {textResult && <ResultRow label="Random text" value={textResult} />}
-        </Section>
+        </Section>}
 
-        {/* Number */}
-        <Section title="Random Number">
+        {randomType === 'number' && <Section title="Random Number">
           <div className="flex flex-wrap items-end gap-3">
             <Input
               label="Min"
               type="number"
               value={numMin}
               onChange={(e) => setNumMin(Number(e.target.value))}
-              className="w-24"
+              containerClassName="w-24"
             />
             <Input
               label="Max"
               type="number"
               value={numMax}
               onChange={(e) => setNumMax(Number(e.target.value))}
-              className="w-24"
+              containerClassName="w-24"
             />
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-medium text-text-muted uppercase tracking-wider">Decimals</label>
@@ -144,10 +160,9 @@ export default function RandomTool() {
             </Button>
           </div>
           {numResult && <ResultRow label="Random number" value={numResult} />}
-        </Section>
+        </Section>}
 
-        {/* Email */}
-        <Section title="Random Email">
+        {randomType === 'email' && <Section title="Random Email">
           <div className="flex flex-wrap items-end gap-3">
             <CountSelect value={count} onChange={setCount} />
             <Button onClick={() => setEmailResult(multiGenerate(randomEmail, count))}>
@@ -156,12 +171,12 @@ export default function RandomTool() {
             </Button>
           </div>
           {emailResult && <ResultRow label="Random email" value={emailResult} />}
-        </Section>
+        </Section>}
 
-        {/* Phone */}
-        <Section title="Random Phone">
+        {randomType === 'phone' && <Section title="Random Phone">
           <div className="flex flex-wrap items-end gap-3">
             <Select
+              containerClassName="w-40"
               label="Format"
               value={phoneFormat}
               onChange={(e) => setPhoneFormat(e.target.value as PhoneFormat)}
@@ -178,22 +193,30 @@ export default function RandomTool() {
             </Button>
           </div>
           {phoneResult && <ResultRow label="Random phone" value={phoneResult} />}
-        </Section>
+        </Section>}
 
-        {/* UUID */}
-        <Section title="UUID v4">
+        {randomType === 'uuid' && <Section title={`UUID ${uuidVersion.toUpperCase()}`}>
           <div className="flex flex-wrap items-end gap-3">
+            <Select
+              containerClassName="w-32"
+              label="UUID version"
+              value={uuidVersion}
+              onChange={(e) => setUuidVersion(e.target.value as UUIDVersion)}
+              options={[
+                { value: 'v4', label: 'UUID v4' },
+                { value: 'v7', label: 'UUID v7' },
+              ]}
+            />
             <CountSelect value={count} onChange={setCount} />
-            <Button onClick={() => setUuidResult(multiGenerate(randomUUID, count))}>
+            <Button onClick={() => setUuidResult(multiGenerate(() => randomUUID(uuidVersion), count))}>
               <RefreshCw className="w-3.5 h-3.5" />
               Generate
             </Button>
           </div>
           {uuidResult && <ResultRow label="UUID" value={uuidResult} />}
-        </Section>
+        </Section>}
 
-        {/* Color */}
-        <Section title="Random Color">
+        {randomType === 'color' && <Section title="Random Color">
           <Button onClick={() => setColorResult(randomColor())}>
             <RefreshCw className="w-3.5 h-3.5" />
             Generate
@@ -205,7 +228,7 @@ export default function RandomTool() {
               <ResultRow label="HSL" value={colorResult.hsl} />
             </div>
           )}
-        </Section>
+        </Section>}
       </div>
     </ToolWrapper>
   );
@@ -213,7 +236,7 @@ export default function RandomTool() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-3 p-4 rounded-lg border border/40 bg-surface/30">
+    <div className="flex w-full max-w-2xl flex-col gap-3 p-4 rounded-lg border border/40 bg-surface/30">
       <h3 className="text-sm font-semibold text-secondary">{title}</h3>
       {children}
     </div>
@@ -223,6 +246,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function CountSelect({ value, onChange }: { value: number; onChange: (n: number) => void }) {
   return (
     <Select
+      containerClassName="w-20"
       label="Count"
       value={String(value)}
       onChange={(e) => onChange(Number(e.target.value))}
@@ -239,6 +263,7 @@ function CountSelect({ value, onChange }: { value: number; onChange: (n: number)
 function FormatSelect({ value, onChange }: { value: ResultFormat; onChange: (f: ResultFormat) => void }) {
   return (
     <Select
+      containerClassName="w-40"
       label="Output format"
       value={value}
       onChange={(e) => onChange(e.target.value as ResultFormat)}

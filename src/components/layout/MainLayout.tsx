@@ -1,9 +1,8 @@
-import { Suspense, useEffect } from 'react';
+import { Suspense, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { Loader2 } from 'lucide-react';
-import { useAppStore } from '../../store';
 
 function LoadingFallback() {
   return (
@@ -14,20 +13,23 @@ function LoadingFallback() {
 }
 
 export function MainLayout() {
-  const setSidebarCollapsed = useAppStore((s) => s.setSidebarCollapsed);
-
-  useEffect(() => {
-    const isSidePanel = typeof window !== 'undefined' && window.location.href.includes('sidepanel.html');
-    if (isSidePanel) {
-      setSidebarCollapsed(true);
-    }
-  }, [setSidebarCollapsed]);
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const isSidePanel = pageUrl.includes('sidepanel.html');
+  const isFullPage = pageUrl.includes('fullpage.html');
+  const [extensionSidebarCollapsed, setExtensionSidebarCollapsed] = useState<boolean | null>(
+    isSidePanel ? true : isFullPage ? false : null
+  );
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-page">
       <Header />
       <div className="flex flex-1 min-h-0">
-        <Sidebar />
+        <Sidebar
+          collapsed={extensionSidebarCollapsed ?? undefined}
+          onToggle={extensionSidebarCollapsed === null ? undefined : () => {
+            setExtensionSidebarCollapsed((collapsed) => !collapsed);
+          }}
+        />
         <main className="flex-1 min-w-0 overflow-hidden">
           <Suspense fallback={<LoadingFallback />}>
             <Outlet />

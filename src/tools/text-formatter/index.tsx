@@ -15,7 +15,7 @@ export default function TextFormatterTool() {
 
   const run = useCallback(() => {
     if (!input.trim()) {
-      setResult({ success: false, output: '', error: 'Input is empty' });
+      setResult(null);
       return;
     }
     setResult(transformText(input, selectedTransform));

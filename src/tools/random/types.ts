@@ -1,6 +1,7 @@
 export type RandomTextCharset = 'alpha' | 'alphanumeric' | 'all';
 export type PhoneFormat = 'vn' | 'us' | 'uk';
 export type ResultFormat = 'newline' | 'space' | 'semicolon' | 'list';
+export type UUIDVersion = 'v4' | 'v7';
 
 export interface RandomColor {
   hex: string;
