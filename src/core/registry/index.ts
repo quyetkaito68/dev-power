@@ -55,6 +55,7 @@ export const tools: Tool[] = [
     icon: QrCode,
     component: QrTool,
     keywords: ['qr', 'qrcode', 'barcode', 'scan', 'generate', 'url', 'link'],
+    showInPopup: true,
   },
   {
     id: 'random',

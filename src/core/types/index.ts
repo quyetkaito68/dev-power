@@ -11,6 +11,7 @@ export interface Tool {
   icon: LucideIcon;
   component: ComponentType;
   keywords: string[];
+  showInPopup?: boolean;
 }
 
 export interface CategoryMeta {

@@ -1,9 +1,9 @@
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import { MainLayout } from '../../../components/layout/MainLayout';
-import { CommandPalette } from '../../../components/CommandPalette';
-import { WelcomePage, ToolLoader } from '../../../app/router';
+import { Suspense, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
+import { tools } from '../../../core/registry';
 import { useAppStore } from '../../../store';
+
+const popupTools = tools.filter((tool) => tool.showInPopup);
 
 export default function PopupApp() {
   const { isDark } = useAppStore();
@@ -26,6 +26,7 @@ export default function PopupApp() {
       } else {
         await chrome.sidePanel.open({});
       }
+      window.close();
     } catch (error) {
       console.error('Failed to open side panel', error);
     }
@@ -42,25 +43,32 @@ export default function PopupApp() {
   };
 
   return (
-    <div className="min-h-[420px] w-[360px] overflow-hidden bg-page text-primary">
-      <div className="flex items-center gap-2 border-b border-strong px-3 py-2">
-        <button onClick={handleOpenSidePanel} className="rounded-md border border-strong px-2 py-1 text-xs hover:bg-elevated">
-          Open Side Panel
-        </button>
+    <div className="flex min-h-[420px] max-h-[600px] w-[360px] flex-col overflow-hidden bg-page text-primary">
+      <div className="flex shrink-0 items-center gap-2 border-b border-strong px-3 py-2">
         <button onClick={handleOpenFullPage} className="rounded-md border border-strong px-2 py-1 text-xs hover:bg-elevated">
           Open Full Page
         </button>
+        <button onClick={handleOpenSidePanel} className="rounded-md border border-strong px-2 py-1 text-xs hover:bg-elevated">
+          Open Side Panel
+        </button>
       </div>
-      <HashRouter>
-        <CommandPalette />
-        <Routes>
-          <Route path="/" element={<MainLayout />}>
-            <Route index element={<WelcomePage />} />
-            <Route path="tool/:id" element={<ToolLoader />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Route>
-        </Routes>
-      </HashRouter>
+      <main className="min-h-0 flex-1 overflow-y-auto">
+        {popupTools.map((tool) => {
+          const ToolComponent = tool.component;
+          return (
+            <Suspense
+              key={tool.id}
+              fallback={
+                <div className="flex h-40 items-center justify-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-violet-500" />
+                </div>
+              }
+            >
+              <ToolComponent />
+            </Suspense>
+          );
+        })}
+      </main>
     </div>
   );
 }
